@@ -19,8 +19,15 @@ node tests/dev-server.js 8795
 Tests:
 
 ```bash
-node tests/pricing.test.js && python3 tests/config-parity.py
+node tests/pricing.test.js \
+  && python3 tests/config-parity.py \
+  && python3 tests/price-list-parity.py
 ```
+
+`config-parity.py` proves the browser and the server agree with each other.
+`price-list-parity.py` proves they both agree with `pricing/2026-08-10-price-list.csv`
+— the price list as supplied, kept in the repo so every price has provenance
+and a typo fails a test instead of reaching a customer.
 
 ## Layout
 
@@ -39,7 +46,8 @@ node tests/pricing.test.js && python3 tests/config-parity.py
 | `api/booking.php` | `POST` validates, re-prices, stores, returns a reference. |
 | `api/photos.php` | `POST` attaches optional photos to an existing booking. |
 | `api/payment.php` | The single payment integration point. Currently returns `null` on purpose. |
-| `tests/` | Pricing tests, config parity check, local dev server, preview sync script. |
+| `pricing/` | The price lists as supplied. The source of every number in `config.js`. |
+| `tests/` | Pricing tests, the two parity checks, local dev server, preview sync script. |
 
 ## Design system
 

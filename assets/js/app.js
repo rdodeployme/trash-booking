@@ -346,6 +346,7 @@
       <p class="eyebrow">Step 2 &middot; Items</p>
       <h1>${esc(cat.name)}</h1>
       <p class="step-note">Add what you need collected. The price beside each item is what it costs to have it taken.</p>
+      ${cat.note ? `<p class="cat-note">${esc(cat.note)}</p>` : ''}
 
       <div class="items">
         ${cat.items.map(item => {

@@ -272,6 +272,13 @@ strong { font-weight: 800; }
   box-shadow: 0 0 0 3px var(--bg);
 }
 
+/* A note that applies to the whole category, not one item */
+.cat-note {
+  background: var(--yellow-tint); border-radius: var(--r-sm);
+  padding: 12px var(--s4); margin: 0 0 var(--s4);
+  font-size: 14.5px; font-weight: 800; line-height: 1.4; letter-spacing: -.01em;
+}
+
 /* ---- getting back to the categories ------------------------------------ */
 /* Sits at the top of every item list, in the same place every time. */
 .crumb {

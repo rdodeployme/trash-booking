@@ -151,6 +151,10 @@ const TRASH_CONFIG = {
     },
     {
       id: 'couches', name: 'Couches & Sofas', icon: 'sofa',
+      // Every couch row in the price list carries this instruction. Without it
+      // a chaise gets left off the booking and the crew arrives to more
+      // furniture than was paid for.
+      note: 'Got a chaise? Add the chaise section as well as your couch.',
       items: [
         { id: 'sofa-1', name: 'Couch — 1 seat',  icon: 'sofa-1', charge: 69 },
         { id: 'sofa-2', name: 'Couch — 2 seater', icon: 'sofa-2', charge: 159 },
@@ -213,7 +217,8 @@ const TRASH_CONFIG = {
         { id: 'rim-tyre-truck',   name: 'Rim & tyre — truck',   icon: 'rim-tyre', charge: 69 },
         { id: 'rim-tyre-tractor', name: 'Rim & tyre — tractor', icon: 'rim-tyre', charge: 499,
           note: 'Industrial/agricultural' },
-        { id: 'tyre-truck',       name: 'Tyre only — truck',    icon: 'tyre',     charge: 59 },
+        { id: 'tyre-truck',       name: 'Tyre only — truck',    icon: 'tyre',     charge: 59,
+          note: 'Also covers tractor or bobcat' },
         { id: 'rim-car',          name: 'Rim only — car',       icon: 'rim',      charge: 10 },
         { id: 'rim-truck',        name: 'Rim only — truck',     icon: 'rim',      charge: 19 },
         { id: 'rim-tractor',      name: 'Rim only — tractor',   icon: 'rim',      charge: 59 }
