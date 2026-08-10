@@ -234,8 +234,20 @@ browser's figure agreed (`totalsAgree`).
 
 ## Before this can go live
 
-- **Approved postcodes** — `serviceArea.approvedPostcodes` in `config.js` and
-  `approvedPostcodes` in `api/config.php` are clearly-labelled test values.
+- **Service area** — now real: 417 Victorian postcodes within **150 km of
+  Geelong**, generated from Australia Post coordinates. **Measured straight
+  line, not by road**, which is wrong around Port Phillip Bay — Portsea is
+  35 km by air and roughly 190 km by road, or a Queenscliff–Sorrento ferry.
+  31 Mornington Peninsula postcodes are affected. Decide whether they stay.
+
+  ```bash
+  python3 tools/build-service-area.py     # rewrites both configs
+  ```
+
+  Change the centre, radius or exclusions at the top of that script — never
+  hand-edit the lists. It refuses to write if the radius reaches outside
+  Victoria, since nothing outside VIC is within 150 km of Geelong by road
+  (King Island is the one that would otherwise slip through).
 - **Availability** — the date picker runs on a placeholder rule (first offered
   day is 3 days out, closed Sundays). Connect real run-sheet availability. No
   same-day or next-day promise is made anywhere.

@@ -74,8 +74,36 @@ check('Difficult access routes to manual review',
 check('Heavy item routes to manual review',
   q({ items: { 'mat-dqk': 1 }, conditions: { heavyItem: true } }).paymentAllowed, false);
 
-check('Out-of-area postcode routes to manual review',
-  q({ items: { 'mat-dqk': 1 }, postcode: '9999' }).paymentAllowed, false);
+console.log('\nSERVICE AREA — 150km straight line from Geelong');
+/* Real postcodes on both sides of the boundary. A made-up postcode is a weak
+   test: the source dataset contains a "9999 NORTH POLE" placeholder geocoded
+   to Melbourne CBD, which silently entered the approved list until this
+   assertion caught it. */
+[['3220', 'Geelong', true],
+ ['3218', 'Geelong West', true],
+ ['3000', 'Melbourne CBD', true],
+ ['3350', 'Ballarat', true],
+ ['3280', 'Warrnambool', false],
+ ['3550', 'Bendigo', false],
+ ['3825', 'Moe', false],
+ ['2000', 'Sydney', false],
+ ['9999', 'NORTH POLE placeholder', false]].forEach(([pc, label, expected]) => {
+  check(`${pc} ${label} ${expected ? 'is in area' : 'is out of area'}`,
+    P.isPostcodeApproved(pc), expected);
+});
+
+check('An out-of-area postcode still books, but routes to manual review',
+  q({ items: { 'mat-dqk': 1 }, postcode: '3280' }).paymentAllowed, false);
+
+check('An in-area postcode gets an instant price',
+  q({ items: { 'mat-dqk': 1 }, postcode: '3220' }).paymentAllowed, true);
+
+check('Every approved postcode is a plausible 4-digit Victorian one',
+  TRASH_CONFIG.serviceArea.approvedPostcodes.filter(p => !/^3[0-9]{3}$/.test(p)), []);
+
+check('No duplicate postcodes',
+  TRASH_CONFIG.serviceArea.approvedPostcodes.length,
+  new Set(TRASH_CONFIG.serviceArea.approvedPostcodes).size);
 
 console.log('\nEVERY ITEM PRICES AT EXACTLY ITS OWN CHARGE');
 let checked = 0, bad = 0;

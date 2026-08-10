@@ -297,9 +297,7 @@
         <a class="btn junk-link" href="#" target="_blank" rel="noopener">${esc(C.junk.label)}</a>
       </div>
 
-      ${C.serviceArea.isTestData ? `<p class="flag">SETUP FLAG — the approved postcode list in
-        <code>assets/js/config.js</code> is test data. Replace it with the real collection
-        area before launch.</p>` : ''}
+      ${C.serviceArea.note ? `<p class="flag">SETUP FLAG — ${esc(C.serviceArea.note)}</p>` : ''}
     `;
   };
 
