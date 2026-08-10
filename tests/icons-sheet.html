@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trash — icon contact sheet</title>
+<style>
+  body { font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+         background: #FAFAFA; color: #0A0A0A; margin: 0; padding: 16px 16px 60px; }
+  h1 { font-size: 20px; font-weight: 900; letter-spacing: -.02em; margin: 0 0 4px; }
+  .note { color: #55555A; max-width: 60ch; margin: 0 0 18px; line-height: 1.5; }
+  h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+       color: #6E6E73; margin: 24px 0 10px; }
+  .bar { position: sticky; top: 0; background: #FAFAFA; padding: 10px 0;
+         display: flex; gap: 8px; align-items: center; z-index: 5; }
+  .bar button { font: 800 13px inherit; padding: 9px 14px; border: 0; border-radius: 999px;
+                background: #fff; box-shadow: inset 0 0 0 1.5px #D4D4D4; cursor: pointer; }
+  .bar button[aria-pressed="true"] { background: #FFF800; box-shadow: inset 0 0 0 2px #000; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cell { background: #fff; border-radius: 12px; box-shadow: inset 0 0 0 1px #E6E6E6;
+          padding: 8px; text-align: center; }
+  .thumb { border-radius: 10px; background: #FFFCC7; display: grid; place-items: center;
+           margin: 0 auto 6px; }
+  .thumb.sel { background: #FFF800; }
+  .lbl { font-size: 10.5px; font-weight: 700; line-height: 1.2; color: #55555A; }
+  /* real size: exactly what the item card renders */
+  body[data-size="real"] .cell  { width: 106px; }
+  body[data-size="real"] .thumb { width: 48px; height: 48px; }
+  body[data-size="real"] .thumb svg { width: 44px; height: 32px; display: block; }
+  /* inspection size */
+  body[data-size="big"] .cell  { width: 132px; }
+  body[data-size="big"] .thumb { width: 112px; height: 112px; border-radius: 14px; }
+  body[data-size="big"] .thumb svg { width: 104px; height: 76px; display: block; }
+</style>
+</head>
+<body data-size="real">
+
+<h1>Icon contact sheet</h1>
+<p class="note">Every category and item icon, drawn at the size the item card actually
+renders (44&times;32) and at an inspection size. Judge new icons here at <strong>real
+size</strong> first — anything that only works when enlarged has failed.</p>
+
+<div class="bar">
+  <button type="button" data-size="real" aria-pressed="true">Real size (44&times;32)</button>
+  <button type="button" data-size="big" aria-pressed="false">Inspect</button>
+</div>
+
+<div id="out"></div>
+
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/icons.js"></script>
+<script>
+(function () {
+  const C = TRASH_CONFIG;
+  document.getElementById('out').innerHTML = C.categories.map(cat =>
+    `<h2>${cat.name}</h2><div class="row">` +
+    `<div class="cell"><div class="thumb sel">${TrashIcons.svg(cat.icon)}</div>
+       <div class="lbl">CATEGORY TILE</div></div>` +
+    cat.items.map(i =>
+      `<div class="cell"><div class="thumb">${TrashIcons.svg(i.icon)}</div>
+         <div class="lbl">${i.name}</div></div>`).join('') +
+    `</div>`).join('');
+
+  document.querySelectorAll('.bar button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.body.dataset.size = b.dataset.size;
+      document.querySelectorAll('.bar button').forEach(x =>
+        x.setAttribute('aria-pressed', String(x === b)));
+    });
+  });
+})();
+</script>
+</body>
+</html>

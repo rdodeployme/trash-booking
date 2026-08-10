@@ -1,0 +1,15 @@
+.DS_Store
+
+# Generated bundle. It's a copy of everything else in this repo, so committing
+# it just creates a second version that goes stale.
+#   rebuild:  python3 tests/build-preview.py
+/preview/
+
+# Server-side leftovers, if the site is ever edited in place on the host
+error_log
+*.bak-*
+
+# Where submitted bookings and photos land. These must live OUTSIDE the
+# webroot in production (see api/config.php) — never in the repo.
+/trash-bookings/
+/trash-photos/

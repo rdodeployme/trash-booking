@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book a collection — Trash</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="assets/css/trash.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <img src="assets/img/trash-logo.png" alt="Trash" onerror="this.outerHTML='<span class=&quot;logo-fallback&quot;>Trash.</span>'">
+    </a>
+    <a class="nav-link" href="index.html#how">How it works</a>
+    <a class="nav-link" href="index.html#help">Need help?</a>
+  </div>
+</header>
+
+<nav class="progress" aria-label="Booking progress">
+  <div class="wrap">
+    <button type="button" class="back-btn" id="back-btn">&larr; Back</button>
+    <span class="progress-meta" id="progress-meta">Step 1 of 7</span>
+  </div>
+  <div class="progress-steps" id="progress-steps" aria-hidden="true"></div>
+</nav>
+
+<main class="funnel">
+  <div class="wrap">
+    <div class="layout">
+      <div class="col-main">
+        <div id="step-content" class="step"></div>
+      </div>
+      <aside class="col-side" id="side-summary" hidden></aside>
+    </div>
+  </div>
+</main>
+
+<!-- Sticky mobile booking bar -->
+<div class="cart-bar" id="cart-bar" hidden>
+  <div class="cart-drawer" id="cart-drawer" hidden></div>
+  <div class="cart-inner">
+    <button type="button" class="cart-summary" id="cart-toggle" aria-expanded="false" aria-controls="cart-drawer">
+      <span class="cart-facts">
+        <span class="cart-count" id="cart-count">0 items</span>
+        <span class="cart-total" id="cart-total">$0</span>
+      </span>
+      <span class="cart-chev" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+             stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+      </span>
+      <span class="visually-hidden">Show price breakdown</span>
+    </button>
+    <button type="button" class="btn btn-primary" id="cart-continue">Continue</button>
+  </div>
+</div>
+
+<!-- Screen-reader announcements when the price changes -->
+<p class="visually-hidden" role="status" aria-live="polite" id="price-status"></p>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/pricing.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

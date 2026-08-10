@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trash — Need something big gone?</title>
+<meta name="description" content="Choose your items, see the price and book your collection online. Fixed pricing. No photos needed. No measuring.">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="assets/css/trash.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <img src="assets/img/trash-logo.png" alt="Trash" onerror="this.outerHTML='<span class=&quot;logo-fallback&quot;>Trash.</span>'">
+    </a>
+    <a class="nav-link" href="#how">How it works</a>
+    <a class="nav-link" href="#help">Need help?</a>
+    <a class="header-cta" href="book.html">Start Booking</a>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-inner">
+        <h1>Need something big gone?</h1>
+        <p>Choose your items, see the price and book your collection online.</p>
+        <a class="btn btn-primary btn-lg" href="book.html">Start Booking</a>
+        <div class="trust">
+          <span>Fixed pricing</span>
+          <span>No photos needed</span>
+          <span>No measuring</span>
+          <span>We do the lifting</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2>Select it. Book it. We collect it. We recycle it.</h2>
+      </div>
+      <div class="how">
+        <div class="how-step"><div class="how-num">1</div><div class="how-label">Select your items</div></div>
+        <div class="how-step"><div class="how-num">2</div><div class="how-label">See your price</div></div>
+        <div class="how-step"><div class="how-num">3</div><div class="how-label">Choose a collection date</div></div>
+        <div class="how-step"><div class="how-num">4</div><div class="how-label">We collect and recycle it</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>What are we collecting?</h2>
+        <p class="lede">Your price updates as you add items. One call-out fee per booking.</p>
+      </div>
+      <div class="tiles" id="home-tiles"></div>
+      <div class="measure" style="margin-top:32px">
+        <a class="btn btn-primary btn-lg btn-block" href="book.html">Start Booking</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="help" style="padding-top:0">
+    <div class="wrap">
+      <div class="measure">
+        <div class="note note-yellow">
+          <h3>Have a mixed load or complete clean-out?</h3>
+          <p>Bags and boxes, general household rubbish, renovation waste, garden waste or a full property clean-out — that job is better suited to JUNK.</p>
+          <a class="btn junk-link" href="#" rel="noopener">Go to JUNK</a>
+        </div>
+
+        <div class="note">
+          <h3>Need help?</h3>
+          <p id="help-contact" class="muted">Contact details to be confirmed before launch.</p>
+          <p class="small muted" style="margin-bottom:0">Trash collects the bulky items listed above. We don't take hazardous
+            materials, or mattresses and furniture affected by bed bugs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="logo" href="index.html">
+        <img src="assets/img/trash-logo.png" alt="Trash" onerror="this.outerHTML='<span class=&quot;logo-fallback&quot;>Trash.</span>'">
+      </a>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="book.html">Start Booking</a>
+        <a href="#how">How it works</a>
+        <a href="#help">Need help?</a>
+        <a class="junk-link" href="#">Mixed loads: JUNK</a>
+      </nav>
+    </div>
+    <p class="foot-tag" style="margin:0">Select it. Book it. We collect it. We recycle it.</p>
+  </div>
+</footer>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/pricing.js"></script>
+<script>
+(function () {
+  const C = TRASH_CONFIG;
+
+  /* Category tiles — built from config, linking straight into the funnel. */
+  document.getElementById('home-tiles').innerHTML = C.categories.map(cat => {
+    const from = Math.min.apply(null, cat.items.map(i => i.charge));
+    return `<span class="tile-wrap"><a class="tile" href="book.html#/items/${cat.id}">
+      <span class="tile-thumb">${TrashIcons.svg(cat.icon)}</span>
+      <span class="tile-name">${cat.name}</span>
+      <span class="tile-from">From ${TrashPricing.formatMoney(from)}</span>
+    </a></span>`;
+  }).join('');
+
+  /* Configurable JUNK URL */
+  document.querySelectorAll('.junk-link').forEach(a => {
+    a.href = C.junk.url;
+    a.target = '_blank';
+  });
+
+  /* Contact details only render if they have actually been supplied */
+  const help = document.getElementById('help-contact');
+  const bits = [];
+  if (C.contact.phone) bits.push(`<a href="${C.contact.phoneHref || 'tel:' + C.contact.phone.replace(/\s/g, '')}">${C.contact.phone}</a>`);
+  if (C.contact.email) bits.push(`<a href="mailto:${C.contact.email}">${C.contact.email}</a>`);
+  if (bits.length) { help.innerHTML = bits.join(' &nbsp;·&nbsp; '); help.classList.remove('muted'); }
+})();
+</script>
+</body>
+</html>
