@@ -124,6 +124,10 @@ empty column.
 
 ### Mobile rules that must not regress
 
+- **The sticky bar always offers both directions.** "Add more" sits beside
+  "Continue" so the only visible choice is never "leave the item list". It
+  hides itself on the category grid, where it would be a no-op. The desktop
+  summary rail carries the same pair.
 - **Changing a quantity patches one card, it never re-renders the step.**
   A full render scrolls to the top and moves focus, which on a phone means
   every tap on the last item in a list throws you back to the heading. See

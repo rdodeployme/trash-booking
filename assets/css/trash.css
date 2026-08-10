@@ -634,6 +634,28 @@ input.postcode-input {
 .cart-summary[aria-expanded="true"] .cart-chev { transform: rotate(180deg); }
 .cart-bar .btn { flex: 0 0 auto; }
 
+/* Continue is the primary, but "Add more" has to sit beside it — otherwise the
+   only visible choice in the sticky bar is to leave the item list. */
+.cart-actions { display: flex; gap: var(--s2); flex: 0 0 auto; }
+.cart-actions .btn { padding: 12px 16px; font-size: 15px; }
+
+/* Outline button that works on the black bar */
+.btn-onblack {
+  background: transparent; color: var(--white);
+  box-shadow: inset 0 0 0 2px #4A4A4A;
+}
+.btn-onblack:hover  { box-shadow: inset 0 0 0 2px var(--yellow); color: var(--yellow); }
+.btn-onblack:active { background: #1A1A1A; }
+
+/* Narrow phones: the facts and the two buttons can't share one line, so the
+   buttons take their own row rather than being squeezed to nothing. */
+@media (max-width: 429px) {
+  .cart-inner { flex-wrap: wrap; row-gap: 10px; }
+  .cart-summary { flex: 1 1 100%; }
+  .cart-actions { flex: 1 1 100%; }
+  .cart-actions .btn { flex: 1 1 0; }
+}
+
 .cart-drawer {
   max-width: var(--page); margin: 0 auto var(--s3);
   background: var(--white); color: var(--ink);

@@ -256,7 +256,7 @@
     content.innerHTML = view(route.param);
     wire(route);
     renderSummaryColumn(route.name);
-    renderCartBar(route.name);
+    renderCartBar(route.name, route.param);
 
     const h = $('h1, h2', content);
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
@@ -746,7 +746,9 @@
       </div>
       ${q.manualReview ? `<div class="sum-note">This booking needs to be confirmed by our team before payment.</div>` : ''}
       ${opts.cta ? `<div class="summary-cta">
-        <button type="button" class="btn btn-primary btn-block" data-goto="${opts.cta}">Continue</button></div>` : ''}
+        <button type="button" class="btn btn-primary btn-block" data-goto="${opts.cta}">Continue</button>
+        ${opts.showAddMore ? `<button type="button" class="btn btn-ghost btn-block"
+          data-goto="items" style="margin-top:8px">Add more items</button>` : ''}</div>` : ''}
     </div>`;
   }
 
@@ -755,7 +757,10 @@
     const show = ['items', 'access', 'date', 'details'].indexOf(stepName) !== -1 && itemCount() > 0;
     side.hidden = !show;
     if (!show) { side.innerHTML = ''; return; }
-    side.innerHTML = summaryCard(quote(), { title: 'Your booking', cta: nextFrom(stepName) });
+    side.innerHTML = summaryCard(quote(), {
+      title: 'Your booking', cta: nextFrom(stepName),
+      showAddMore: !(stepName === 'items' && !parseRoute().param)
+    });
     $$('[data-goto]', side).forEach(el => el.addEventListener('click', () => go(el.dataset.goto)));
   }
 
@@ -766,7 +771,7 @@
 
   let lastTotal = null;
 
-  function renderCartBar(stepName) {
+  function renderCartBar(stepName, param) {
     const bar = $('#cart-bar');
     const show = ['items', 'access', 'date'].indexOf(stepName) !== -1 && itemCount() > 0;
     bar.hidden = !show;
@@ -778,6 +783,8 @@
     $('#cart-total').innerHTML = money(q.total) +
       (q.manualReview ? ' <span class="qual">so far</span>' : '');
     $('#cart-continue').dataset.goto = nextFrom(stepName);
+    /* Pointless on the category grid — you're already there. */
+    $('#cart-more').hidden = (stepName === 'items' && !param);
 
     /* Functional cue: the figure the customer is watching just changed. */
     if (lastTotal !== null && lastTotal !== q.total) {
@@ -908,7 +915,7 @@
       $$('[data-goto]', footer).forEach(el => el.addEventListener('click', () => go(el.dataset.goto)));
     }
 
-    renderCartBar('items');
+    renderCartBar('items', parseRoute().param);
     renderSummaryColumn('items');
     announcePrice();
 
@@ -1206,6 +1213,7 @@
   });
 
   $('#cart-continue').addEventListener('click', function () { go(this.dataset.goto || 'access'); });
+  $('#cart-more').addEventListener('click', () => go('items'));
 
   window.addEventListener('hashchange', render);
 
