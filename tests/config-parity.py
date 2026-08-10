@@ -43,7 +43,7 @@ def php_fee(key):
     m = re.search(r"'%s'\s*=>\s*([0-9.]+)" % key, php)
     return float(m.group(1)) if m else None
 
-srv_fees = {k: php_fee(k) for k in ("calloutStandard", "calloutStairs", "urgent")}
+srv_fees = {k: php_fee(k) for k in ("stairs", "urgent")}
 
 srv_tiers = {}
 srv_manual = []

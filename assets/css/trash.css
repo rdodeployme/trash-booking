@@ -331,6 +331,14 @@ strong { font-weight: 800; }
 .item-name  { font-weight: 800; font-size: 15.5px; line-height: 1.22; letter-spacing: -.02em; }
 .item-price { font-weight: 800; font-size: 15px; color: var(--ink-2); margin-top: 2px; }
 .item-card.is-selected .item-price { color: var(--ink); }
+/* Short description from the pricing sheet — the only thing that tells a bed
+   base from a bed frame at a glance. */
+.item-note {
+  font-size: 12.5px; font-weight: 600; color: var(--ink-3);
+  line-height: 1.3; margin-top: 3px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .add-btn { width: 100%; min-height: 44px; font-size: 15px; padding: 12px 8px; }
 

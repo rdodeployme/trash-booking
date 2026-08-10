@@ -5,12 +5,12 @@
    what calculateBooking() returns; the server re-runs the same rules in
    api/quote.php before any payment is accepted.
 
-   Rules:
-     calloutFee   = stairs ? 199 : 99          (REPLACES, never adds)
+   Rules (all-in pricing, from 2026-08-10 — there is no call-out fee):
      itemTotal    = sum(quantity x itemCharge) (no multi-item discount)
+     stairsFee    = stairs ? 100 : 0           (flat, ONCE per booking)
      urgentFee    = urgent ? 100 : 0
      dismantling  = 0 / 20 / 60 / manual review
-     bookingTotal = calloutFee + itemTotal + urgentFee + dismantlingFee
+     bookingTotal = itemTotal + stairsFee + urgentFee + dismantlingFee
 
    Manual review (payment disabled) is triggered by:
      - dismantling 6+ items
@@ -68,10 +68,6 @@
     const conditions  = booking.conditions || {};
     const tier        = getDismantlingTier(booking.dismantling);
 
-    /* --- Call-out: stairs REPLACES standard, it is never added on top ----- */
-    const calloutCents = toCents(stairs ? CONFIG.fees.calloutStairs : CONFIG.fees.calloutStandard);
-    const calloutLabel = stairs ? 'Stairs call-out fee' : 'Call-out fee';
-
     /* --- Items: full price for every unit, no discount ------------------- */
     const lines = [];
     let itemCents = 0;
@@ -96,7 +92,8 @@
       });
     });
 
-    /* --- Add-ons --------------------------------------------------------- */
+    /* --- Add-ons. Each is flat and charged ONCE, never per item. ---------- */
+    const stairsCents = stairs ? toCents(CONFIG.fees.stairs) : 0;
     const urgentCents = urgent ? toCents(CONFIG.fees.urgent) : 0;
     const dismantlingCents = tier.manualReview ? 0 : toCents(tier.fee || 0);
 
@@ -110,13 +107,13 @@
     }
     const manualReview = reviewReasons.length > 0;
 
-    const totalCents = calloutCents + itemCents + urgentCents + dismantlingCents;
+    const totalCents = itemCents + stairsCents + urgentCents + dismantlingCents;
 
     return {
-      callout: {
-        label:  calloutLabel,
-        amount: toDollars(calloutCents),
-        stairs: stairs
+      stairs: {
+        applied: stairs,
+        label:   'Stairs',
+        amount:  toDollars(stairsCents)
       },
       lines: lines,
       itemCount: itemCount,

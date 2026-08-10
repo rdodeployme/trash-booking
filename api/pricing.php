@@ -23,11 +23,8 @@ function trash_calculate_booking(array $booking, array $cfg): array {
     if (!isset($tiers[$tierId])) { $tierId = 'none'; }
     $tier = $tiers[$tierId];
 
-    /* Call-out: stairs REPLACES the standard fee. Never both. */
-    $calloutCents = (int)round(($stairs ? $cfg['fees']['calloutStairs'] : $cfg['fees']['calloutStandard']) * 100);
-    $calloutLabel = $stairs ? 'Stairs call-out fee' : 'Call-out fee';
-
-    /* Items: full charge per unit, no multi-item discount. */
+    /* Items: full charge per unit, no multi-item discount. Prices are ALL-IN —
+       there is no call-out fee. */
     $lines     = [];
     $itemCents = 0;
     $itemCount = 0;
@@ -47,6 +44,8 @@ function trash_calculate_booking(array $booking, array $cfg): array {
         ];
     }
 
+    /* Flat add-ons, each charged ONCE per booking, never per item. */
+    $stairsCents      = $stairs ? (int)round($cfg['fees']['stairs'] * 100) : 0;
     $urgentCents      = $urgent ? (int)round($cfg['fees']['urgent'] * 100) : 0;
     $dismantlingCents = $tier['manualReview'] ? 0 : (int)round(((float)$tier['fee']) * 100);
 
@@ -66,13 +65,13 @@ function trash_calculate_booking(array $booking, array $cfg): array {
     }
     $manualReview = count($reasons) > 0;
 
-    $totalCents = $calloutCents + $itemCents + $urgentCents + $dismantlingCents;
+    $totalCents = $itemCents + $stairsCents + $urgentCents + $dismantlingCents;
 
     return [
-        'callout' => [
-            'label'  => $calloutLabel,
-            'amount' => $calloutCents / 100,
-            'stairs' => $stairs,
+        'stairs' => [
+            'applied' => $stairs,
+            'label'   => 'Stairs',
+            'amount'  => $stairsCents / 100,
         ],
         'lines'     => $lines,
         'itemCount' => $itemCount,

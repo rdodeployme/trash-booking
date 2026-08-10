@@ -11,10 +11,11 @@
 
 return [
 
+  // Item prices are ALL-IN. There is no call-out fee. Flat add-ons only,
+  // each charged once per booking, never per item.
   'fees' => [
-    'calloutStandard' => 99,
-    'calloutStairs'   => 199,   // replaces the standard call-out, never added to it
-    'urgent'          => 100,
+    'stairs' => 100,
+    'urgent' => 100,
   ],
 
   'dismantlingTiers' => [
@@ -41,48 +42,90 @@ return [
     '3076','3078','3079','3081','3121','3141','3182',
   ],
 
-  // itemId => [name, charge]. volumeM3 is internal and not needed to price.
+  // itemId => [name, charge]. All-in prices; no call-out is added.
   'items' => [
-    'mat-single'      => ['Single mattress',            39.00],
-    'mat-king-single' => ['King single mattress',       45.50],
-    'mat-double'      => ['Double mattress',            58.50],
-    'mat-queen'       => ['Queen mattress',             65.00],
-    'mat-king'        => ['King mattress',              78.00],
+    // Mattresses
+    'mat-single-ks'         => ['Mattress — single/king single', 99.00],
+    'mat-dqk'               => ['Mattress — double/queen/king', 139.00],
+    'mat-cot'               => ['Mattress — cot or crib', 29.00],
+    'topper-single-ks'      => ['Topper — single/king single', 19.00],
+    'topper-dqk'            => ['Topper — double/queen/king', 29.00],
 
-    'base-single'      => ['Single bed base',           45.50],
-    'base-king-single' => ['King single bed base',      52.00],
-    'base-double'      => ['Double bed base',           65.00],
-    'base-queen'       => ['Queen bed base',            78.00],
-    'base-king'        => ['King bed base',             91.00],
+    // Beds & Bases
+    'base-single-ks'        => ['Bed base — single/king single', 79.00],
+    'base-dqk'              => ['Bed base — double/queen/king', 99.00],
+    'frame-single-ks'       => ['Bed frame — single/king single', 79.00],
+    'frame-dqk'             => ['Bed frame — double/queen/king', 99.00],
+    'headboard-single-ks'   => ['Headboard — single/king single', 39.00],
+    'headboard-dqk'         => ['Headboard — double/queen/king', 49.00],
+    'bunk-ss'               => ['Bunk bed — single over single', 129.00],
+    'bunk-sd'               => ['Bunk bed — single over double', 169.00],
+    'bunk-dd'               => ['Bunk bed — double over double', 229.00],
 
-    'sofa-armchair' => ['Armchair or single-seater',    65.00],
-    'sofa-2'        => ['Two-seater sofa',             130.00],
-    'sofa-3'        => ['Three-seater sofa',           195.00],
-    'sofa-4'        => ['Four-seater sofa',            260.00],
-    'sofa-modular'  => ['Modular or corner lounge',    325.00],
+    // Couches & Sofas
+    'sofa-1'                => ['Couch — 1 seat', 69.00],
+    'sofa-2'                => ['Couch — 2 seater', 159.00],
+    'sofa-3'                => ['Couch — 3 seater', 169.00],
+    'sofa-4'                => ['Couch — 4 seater', 189.00],
+    'sofa-5'                => ['Couch — 5 seater', 199.00],
+    'sofa-6'                => ['Couch — 6 seater', 279.00],
+    'sofa-7'                => ['Couch — 7 seater', 299.00],
+    'sofa-8'                => ['Couch — 8 seater', 399.00],
+    'sofa-chaise'           => ['Chaise section', 59.00],
 
-    'sofabed-1' => ['Single sofa bed',                  97.50],
-    'sofabed-2' => ['Two-seater sofa bed',             156.00],
-    'sofabed-3' => ['Three-seater sofa bed',           208.00],
+    // Recliners
+    'rec-1'                 => ['Recliner — 1 seat', 79.00],
+    'rec-2'                 => ['Recliner — 2 seat', 159.00],
+    'rec-3'                 => ['Recliner — 3 seat', 179.00],
+    'rec-electric'          => ['Electric recliner', 91.00],   // legacy — needs repricing
 
-    'rec-standard' => ['Standard recliner',             78.00],
-    'rec-electric' => ['Electric recliner',             91.00],
-    'rec-2'        => ['Two-seater recliner',          156.00],
+    // Sofa Beds & Futons
+    'futon-2'               => ['Futon — 2 seater', 169.00],
+    'futon-3'               => ['Futon — 3 seater', 199.00],
+    'sofabed-1'             => ['Single sofa bed', 97.50],   // legacy — needs repricing
+    'sofabed-2'             => ['Two-seater sofa bed', 156.00],   // legacy — needs repricing
+    'sofabed-3'             => ['Three-seater sofa bed', 208.00],   // legacy — needs repricing
 
-    'table-4' => ['Four-seat dining table',             39.00],
-    'table-6' => ['Six-seat dining table',              52.00],
-    'table-8' => ['Eight-seat dining table',            78.00],
+    // Outdoor Lounges
+    'out-1'                 => ['Outdoor couch — armchair', 69.00],
+    'out-2'                 => ['Outdoor couch — 2 seater', 149.00],
+    'out-3'                 => ['Outdoor couch — 3 seater', 169.00],
+    'out-4'                 => ['Outdoor couch — 4 seater', 189.00],
+    'out-5'                 => ['Outdoor couch — 5 seater', 199.00],
+    'out-6'                 => ['Outdoor couch — 6 seater', 279.00],
+    'out-7'                 => ['Outdoor couch — 7 seater', 299.00],
+    'out-8'                 => ['Outdoor couch — 8 seater', 399.00],
 
-    'chair-1' => ['Individual dining chair',            13.00],
-    'chair-4' => ['Set of four dining chairs',          52.00],
-    'chair-6' => ['Set of six dining chairs',           78.00],
+    // Pianos
+    'piano-upright'         => ['Upright piano', 1299.00],
+    'piano-baby-grand'      => ['Baby grand piano', 1299.00],
+    'piano-grand'           => ['Grand piano', 1299.00],
 
-    'fridge-bar'    => ['Bar fridge',                   26.00],
-    'fridge-single' => ['Standard single-door fridge',  52.00],
-    'fridge-double' => ['Large two-door fridge',        84.50],
-    'fridge-french' => ['French-door fridge',           97.50],
-    'freezer-up'    => ['Upright freezer',              52.00],
-    'freezer-chest' => ['Chest freezer',                65.00],
+    // Tyres & Rims
+    'rim-tyre-truck'        => ['Rim & tyre — truck', 69.00],
+    'rim-tyre-tractor'      => ['Rim & tyre — tractor', 499.00],
+    'tyre-truck'            => ['Tyre only — truck', 59.00],
+    'rim-car'               => ['Rim only — car', 10.00],
+    'rim-truck'             => ['Rim only — truck', 19.00],
+    'rim-tractor'           => ['Rim only — tractor', 59.00],
+
+    // Dining Tables
+    'table-4'               => ['Four-seat dining table', 39.00],   // legacy — needs repricing
+    'table-6'               => ['Six-seat dining table', 52.00],   // legacy — needs repricing
+    'table-8'               => ['Eight-seat dining table', 78.00],   // legacy — needs repricing
+
+    // Dining Chairs
+    'chair-1'               => ['Individual dining chair', 13.00],   // legacy — needs repricing
+    'chair-4'               => ['Set of four dining chairs', 52.00],   // legacy — needs repricing
+    'chair-6'               => ['Set of six dining chairs', 78.00],   // legacy — needs repricing
+
+    // Fridges & Freezers
+    'fridge-bar'            => ['Bar fridge', 26.00],   // legacy — needs repricing
+    'fridge-single'         => ['Standard single-door fridge', 52.00],   // legacy — needs repricing
+    'fridge-double'         => ['Large two-door fridge', 84.50],   // legacy — needs repricing
+    'fridge-french'         => ['French-door fridge', 97.50],   // legacy — needs repricing
+    'freezer-up'            => ['Upright freezer', 52.00],   // legacy — needs repricing
+    'freezer-chest'         => ['Chest freezer', 65.00],   // legacy — needs repricing
   ],
 
   'maxQuantityPerItem' => 20,

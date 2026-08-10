@@ -86,16 +86,20 @@
   }
 
   /* ---------------------------------------------------------- bed bases ---- */
-  /* The matching footprint, slatted and pillow-less, so a base is never
-     mistaken for the mattress that goes on it. */
+  /* The price list calls a base "a solid box", so it must NOT be slatted —
+     slats are what makes a bed FRAME a frame. A base is a solid slab with the
+     ensemble split down the middle and castors at the corners: no pillows
+     (that's the mattress), no slats (that's the frame). */
   function bedbase(len, wid) {
     const x = 60 - len / 2, y = 40 - wid / 2;
     let d = rr(x, y, len, wid, 6);
-    const inset = 7, slats = 5, sw = 5;
-    const span = len - inset * 2;
-    for (let i = 0; i < slats; i++) {
-      d += rr(x + inset + (span - sw) * (i / (slats - 1)), y + 7, sw, wid - 14, 2.5);
-    }
+    d += rr(x + 8, 38.5, len - 16, 3, 1.5);                    // ensemble split
+    const r = 3.5, inset = 9;
+    [[x + inset, y + inset], [x + len - inset, y + inset],
+     [x + inset, y + wid - inset], [x + len - inset, y + wid - inset]]
+      .forEach(c => {                                           // castors
+        d += `M${n(c[0] - r)},${n(c[1])}a${r},${r} 0 1,0 ${r * 2},0a${r},${r} 0 1,0 ${-r * 2},0Z`;
+      });
     return EO(d);
   }
 
@@ -121,6 +125,20 @@
     const cw = (innerW - gap * (seats - 1)) / seats;
     for (let i = 0; i < seats; i++) s += P(rr(innerX + i * (cw + gap), 28, cw, 15, 3));
     s += EO(rr(x - 5, 50, w + 10, 20, 5) + rr(60 - 13, 55, 26, 9, 4));  // bed + pillow
+    return s;
+  }
+
+  /* Outdoor lounge: the same seat count, but a slatted timber frame rather
+     than upholstery, so an indoor and an outdoor couch never look the same. */
+  function outdoor(seats, w) {
+    const x = 60 - w / 2;
+    let s = EO(rr(x + 5, 12, w - 10, 22, 5) +
+      [0, 1, 2].map(i => rr(x + 10, 16 + i * 6.5, w - 20, 3.5, 1.5)).join(''));  // slatted back
+    s += P(rr(x, 32, 10, 26, 4)) + P(rr(x + w - 10, 32, 10, 26, 4));             // arms
+    const innerX = x + 13, innerW = w - 26, gap = 3;
+    const cw = (innerW - gap * (seats - 1)) / seats;
+    for (let i = 0; i < seats; i++) s += P(rr(innerX + i * (cw + gap), 38, cw, 16, 3));
+    s += P(rr(x + 5, 60, 8, 10, 2)) + P(rr(x + w - 13, 60, 8, 10, 2));           // legs
     return s;
   }
 
@@ -188,6 +206,93 @@
     return s;
   }
 
+  /* --------------------------------------------- bed frames & headboards --- */
+  /* A bed BASE is a solid box; a bed FRAME has slats and posts. That is the
+     whole difference in the price list, so it has to be the whole difference
+     in the drawing. */
+  function bedframe(len, wid) {
+    const x = 60 - len / 2, y = 40 - wid / 2;
+    let s = P(rr(x, y, 9, wid, 3));                       // headboard, at the left
+    s += P(rr(x + len - 6, y + 4, 6, wid - 8, 3));        // footer
+    const first = x + 13, span = len - 22, slats = 5, sw = 5;
+    for (let i = 0; i < slats; i++) {
+      s += P(rr(first + (span - sw) * (i / (slats - 1)), y + 5, sw, wid - 10, 2.5));
+    }
+    // corner leg posts
+    [[x, y], [x + len - 8, y], [x, y + wid - 8], [x + len - 8, y + wid - 8]]
+      .forEach(c => { s += P(rr(c[0], c[1], 8, 8, 2)); });
+    return s;
+  }
+
+  /* Headboard, seen head-on: a board on two legs. */
+  function headboard(w) {
+    const x = 60 - w / 2;
+    return P(rr(x, 14, w, 34, 7)) +
+           P(rr(x + 6, 48, 8, 18, 3)) + P(rr(x + w - 14, 48, 8, 18, 3));
+  }
+
+  /* Bunk bed, side on. Two mattress slabs between posts, upper and lower
+     drawn at their real relative widths so single/single, single/double and
+     double/double read differently. */
+  function bunk(topW, botW) {
+    const postL = 16, postR = 104;
+    let s = P(rr(postL, 8, 8, 64, 3)) + P(rr(postR, 8, 8, 64, 3));   // posts
+    s += P(rr(postL, 22, topW, 11, 3));                              // upper bunk
+    s += P(rr(postL, 54, botW, 11, 3));                              // lower bunk
+    s += P(rr(postL + 6, 36, 4, 16, 2));                             // ladder rail
+    s += P(rr(postL + 4, 40, 12, 3.5, 1.5)) + P(rr(postL + 4, 47, 12, 3.5, 1.5));
+    return s;
+  }
+
+  /* ------------------------------------------------------------- pianos --- */
+  /* Upright: a tall case with a keyboard band. Grand: plan view, curved body
+     with the keyboard along the straight edge. */
+  /* The keys are what make it a piano and not a bench, so they get cut into
+     the keyboard band as holes rather than being implied by a plain bar. */
+  const PIANO_UPRIGHT =
+    EO(rr(26, 8, 68, 32, 4) + rr(34, 14, 52, 4, 2)) +           // case + music desk
+    EO(rr(20, 42, 80, 16, 2) +
+       [0, 1, 2, 3, 4, 5, 6].map(i => rr(26 + i * 10, 45, 5, 10, 1)).join('')) +  // keys
+    P(rr(28, 60, 10, 12, 2)) + P(rr(82, 60, 10, 12, 2));        // legs
+
+  const PIANO_GRAND =
+    EO('M22,18 H72 A32,26 0 0 1 72,70 H22 Z' +
+       'M30,26 H62 A20,16 0 0 1 62,58 H30 Z') +          // curved body with soundboard cut
+    EO(rr(10, 18, 12, 52, 3) +
+       [0, 1, 2, 3, 4].map(i => rr(12, 22 + i * 9.5, 8, 5, 1)).join(''));  // keyboard edge
+
+  /* --------------------------------------------------- tyres and rims ---- */
+  const ring = (cx, cy, ro, ri) =>
+    EO(`M${cx - ro},${cy}a${ro},${ro} 0 1,0 ${ro * 2},0a${ro},${ro} 0 1,0 ${-ro * 2},0Z` +
+       `M${cx - ri},${cy}a${ri},${ri} 0 1,0 ${ri * 2},0a${ri},${ri} 0 1,0 ${-ri * 2},0Z`);
+
+  /* A rim is a wheel with bolt holes; a tyre is a thick black ring; rim & tyre
+     is both, so the three are never the same drawing. */
+  const RIM = (() => {
+    const cx = 60, cy = 40, ro = 30;
+    let d = `M${cx - ro},${cy}a${ro},${ro} 0 1,0 ${ro * 2},0a${ro},${ro} 0 1,0 ${-ro * 2},0Z`;
+    d += `M${cx - 8},${cy}a8,8 0 1,0 16,0a8,8 0 1,0 -16,0Z`;              // hub hole
+    for (let i = 0; i < 5; i++) {                                          // bolt holes
+      const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+      const hx = cx + Math.cos(a) * 19, hy = cy + Math.sin(a) * 19;
+      d += `M${n(hx - 4.5)},${n(hy)}a4.5,4.5 0 1,0 9,0a4.5,4.5 0 1,0 -9,0Z`;
+    }
+    return EO(d);
+  })();
+
+  const TYRE = ring(60, 40, 34, 19);
+  const RIM_AND_TYRE = ring(60, 40, 34, 22) + (() => {
+    const cx = 60, cy = 40;
+    let d = `M${cx - 19},${cy}a19,19 0 1,0 38,0a19,19 0 1,0 -38,0Z`;
+    d += `M${cx - 6},${cy}a6,6 0 1,0 12,0a6,6 0 1,0 -12,0Z`;
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+      const hx = cx + Math.cos(a) * 12, hy = cy + Math.sin(a) * 12;
+      d += `M${n(hx - 3.2)},${n(hy)}a3.2,3.2 0 1,0 6.4,0a3.2,3.2 0 1,0 -6.4,0Z`;
+    }
+    return EO(d);
+  })();
+
   /* ------------------------------------------------ fridges and freezers --- */
   /* A freezer badge: a hole punched in the door with a snowflake sitting in it,
      so an upright freezer never reads as just another single-door fridge.
@@ -201,34 +306,58 @@
 
     /* Mattresses — length x width to scale (AU sizes), pillows tell singles
        from doubles. 92x188, 107x203, 138x188, 153x203, 183x203 cm. */
-    'mattress':    mattress(78, 59, 2),
-    'mattress-s':  mattress(72, 35, 1),
-    'mattress-ks': mattress(78, 41, 1),
-    'mattress-d':  mattress(72, 53, 2),
-    'mattress-q':  mattress(78, 59, 2),
-    'mattress-k':  mattress(78, 70, 2),
+    'mattress':     mattress(78, 59, 2),
+    'mattress-s':   mattress(74, 38, 1),
+    'mattress-ks':  mattress(78, 41, 1),
+    'mattress-d':   mattress(72, 53, 2),
+    'mattress-q':   mattress(78, 59, 2),
+    'mattress-k':   mattress(78, 68, 2),
+    'mattress-cot': mattress(48, 30, 1),
 
-    /* Bed bases — same footprints, slatted */
+    /* Mattress toppers — a thin quilted pad, no pillows, so it never reads
+       as the mattress it goes on top of. */
+    'topper-s': EO(rr(23, 26, 74, 28, 6) +
+      [0, 1, 2, 3].map(i => rr(31 + i * 17, 32, 10, 16, 3)).join('')),
+    'topper-k': EO(rr(21, 20, 78, 40, 7) +
+      [0, 1, 2, 3].map(i => rr(29 + i * 18, 27, 11, 11, 3)).join('') +
+      [0, 1, 2, 3].map(i => rr(29 + i * 18, 42, 11, 11, 3)).join('')),
+
+    /* Bed bases — a solid box, per the price list, so it must NOT be slatted */
     'bedbase':    bedbase(78, 59),
-    'bedbase-s':  bedbase(72, 35),
-    'bedbase-ks': bedbase(78, 41),
-    'bedbase-d':  bedbase(72, 53),
-    'bedbase-q':  bedbase(78, 59),
-    'bedbase-k':  bedbase(78, 70),
+    'bedbase-s':  bedbase(74, 38),
+    'bedbase-k':  bedbase(78, 68),
 
-    /* Sofas — count the cushions */
-    'sofa':     sofa(3, 92),
-    'armchair': sofa(1, 48),
-    'sofa-2':   sofa(2, 72),
-    'sofa-3':   sofa(3, 92),
-    'sofa-4':   sofa(4, 110),
+    /* Bed frames — slats, posts and a headboard */
+    'bedframe-s': bedframe(74, 38),
+    'bedframe-k': bedframe(78, 68),
 
-    /* Corner lounge — plan view, because the L footprint IS the product */
-    'modular':
-      P(rr(14, 10, 32, 30, 6)) +
-      P(rr(14, 43, 32, 26, 6)) +
-      P(rr(49, 43, 27, 26, 6)) +
-      P(rr(79, 43, 27, 26, 6)),
+    /* Headboards */
+    'headboard-s': headboard(58),
+    'headboard-k': headboard(86),
+
+    /* Bunk beds — the two tiers are drawn at their real relative widths */
+    'bunk-ss': bunk(58, 58),
+    'bunk-sd': bunk(58, 88),
+    'bunk-dd': bunk(88, 88),
+
+    /* Couches — count the cushions. Past four seats the frame stops growing
+       and only the cushion count changes, or an 8-seater would run off the
+       canvas and every large size would look identical. */
+    'sofa':   sofa(3, 92),
+    'sofa-1': sofa(1, 48),
+    'sofa-2': sofa(2, 72),
+    'sofa-3': sofa(3, 92),
+    'sofa-4': sofa(4, 110),
+    'sofa-5': sofa(5, 114),
+    'sofa-6': sofa(6, 114),
+    'sofa-7': sofa(7, 116),
+    'sofa-8': sofa(8, 116),
+
+    /* Chaise section on its own — an L of seat with one arm */
+    'chaise':
+      P(rr(16, 20, 14, 46, 5)) +          // back/arm along the left
+      P(rr(34, 20, 60, 20, 5)) +          // backrest run
+      P(rr(34, 44, 60, 22, 4)),           // seat
 
     /* Sofa beds */
     'sofabed':   sofabed(2, 74),
@@ -241,6 +370,27 @@
     'recliner-e': recliner(1, 54,
       P('M25,20L10,42H19L14,60L30,36H21Z')),        // power bolt
     'recliner-2': recliner(2, 88),
+    'recliner-3': recliner(3, 110),
+
+    /* Outdoor lounges — the same seat count, on a slatted frame */
+    'outdoor':   outdoor(3, 92),
+    'outdoor-1': outdoor(1, 50),
+    'outdoor-2': outdoor(2, 74),
+    'outdoor-3': outdoor(3, 92),
+    'outdoor-4': outdoor(4, 110),
+    'outdoor-5': outdoor(5, 114),
+    'outdoor-6': outdoor(6, 114),
+    'outdoor-7': outdoor(7, 116),
+    'outdoor-8': outdoor(8, 116),
+
+    /* Pianos */
+    'piano':       PIANO_UPRIGHT,
+    'piano-grand': PIANO_GRAND,
+
+    /* Tyres and rims */
+    'tyre':     TYRE,
+    'rim':      RIM,
+    'rim-tyre': RIM_AND_TYRE,
 
     /* Dining tables — count the chairs */
     'table':   table(6),

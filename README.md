@@ -77,8 +77,11 @@ identical icons at thumbnail size.
 
 | Category | What separates the variants |
 |---|---|
-| Mattresses, bed bases | Plan view at true AU dimensions; one pillow for singles, two for doubles and up; bases are slatted |
-| Sofas, sofa beds | Countable seat cushions |
+| Mattresses | Plan view at true AU dimensions; one pillow for singles, two for doubles and up |
+| Bed bases vs frames | A base is a **solid** slab with castors; a frame is **slatted** with posts and a headboard. The price list says a base is "a solid box" — that distinction has to be the drawing, or the two are the same icon |
+| Bunk beds | The two tiers at their real relative widths: single/single, single/double, double/double |
+| Outdoor lounges | The same seat count on a **slatted** frame, so indoor and outdoor never match |
+| Couches, sofa beds | Countable seat cushions, up to about four. Past that the cushions are too thin to count at 44px and the name carries it — the same honest limit as double vs queen |
 | Recliners | Cushion count, plus a bolt for electric |
 | Dining tables | Plan view — count the chairs around it (4 / 6 / 8) |
 | Dining chairs | The chair drawn once, four times, six times in a row |
@@ -132,18 +135,41 @@ empty column.
 
 ## Pricing rules
 
-One function decides every price, in two places that are kept in step by
-`tests/config-parity.py`:
+**Prices are ALL-IN.** There is no call-out fee — the price beside an item is
+what that item costs to have collected. One function decides every price, in
+two places kept in step by `tests/config-parity.py`:
 
 ```
-calloutFee   = stairs ? 199 : 99          # stairs REPLACES the standard fee
 itemTotal    = sum(quantity × itemCharge) # no multi-item discount
+stairsFee    = stairs ? 100 : 0           # flat, ONCE per booking
 urgentFee    = urgent ? 100 : 0
 dismantling  = none 0 | 1–2 $20 | 3–5 $60 | 6+ manual review
-bookingTotal = calloutFee + itemTotal + urgentFee + dismantlingFee
+bookingTotal = itemTotal + stairsFee + urgentFee + dismantlingFee
 ```
 
-Cubic volumes are stored per item for internal use and are never rendered.
+This replaced the original `$99 call-out + volume × $130/m³` model on
+2026-08-10. Prices now come from the supplied price list and are set by hand,
+so `volumeM3` survives only as internal reference on the items that had one —
+it is never rendered and never priced against.
+
+### Legacy items — 16 of them
+
+Dining tables, dining chairs, fridges & freezers, the three sofa beds and the
+electric recliner were **not in the 2026-08-10 price list**. They are still on
+the old volume-based pricing, marked `legacy: true` in `config.js`, and
+** NEED REPRICING BEFORE LAUNCH **. They were kept bookable rather than
+dropped, so the catalogue currently runs two pricing models at once.
+`tests/pricing.test.js` pins the count at 16 so it can't be quietly forgotten.
+
+### Gaps in the supplied price list
+
+Not invented, and not added:
+
+- **No car rim & tyre** — the most common case. Rim-only exists for car, truck
+  and tractor; rim & tyre only for truck and tractor.
+- **No car or tractor tyre-only price.** `Tyre only — truck` is also described
+  in the source as "for a tractor, truck or bob cat", contradicting its name.
+- All three pianos are $1299, despite an upright being far smaller than a grand.
 
 ### Manual review
 

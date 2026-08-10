@@ -345,7 +345,7 @@
       </button>
       <p class="eyebrow">Step 2 &middot; Items</p>
       <h1>${esc(cat.name)}</h1>
-      <p class="step-note">Add what you need collected. One call-out fee per booking.</p>
+      <p class="step-note">Add what you need collected. The price beside each item is what it costs to have it taken.</p>
 
       <div class="items">
         ${cat.items.map(item => {
@@ -355,6 +355,7 @@
             <div class="item-main">
               <div class="item-name" id="name-${item.id}">${esc(item.name)}</div>
               <div class="item-price">${money(item.charge)}</div>
+              ${item.note ? `<div class="item-note">${esc(item.note)}</div>` : ''}
             </div>
             <div class="item-actions">${itemActions(item, qty)}</div>
           </div>`;
@@ -420,17 +421,17 @@
             <input type="radio" name="stairs" value="no" ${state.stairs === false ? 'checked' : ''}>
             <span class="mark"></span>
             <span>No stairs</span>
-            ${showFees ? `<span class="choice-fee">${money(C.fees.calloutStandard)} call-out</span>` : ''}
+            ${showFees ? `<span class="choice-fee is-zero">No charge</span>` : ''}
           </label>
           <label class="choice">
             <input type="radio" name="stairs" value="yes" ${state.stairs === true ? 'checked' : ''}>
             <span class="mark"></span>
             <span>Yes, stairs are involved</span>
-            ${showFees ? `<span class="choice-fee">${money(C.fees.calloutStairs)} call-out</span>` : ''}
+            ${showFees ? `<span class="choice-fee">+${money(C.fees.stairs)}</span>` : ''}
           </label>
         </div>
-        <p class="question-foot">If there are stairs, the stairs call-out replaces the standard one.
-          It is never added on top.</p>
+        <p class="question-foot">If there are stairs, one flat stairs charge applies to the whole
+          booking — never per item.</p>
       </div>
 
       <div class="question">
@@ -713,14 +714,17 @@
       rail and the mobile drawer. One layout, so the figures always match. */
   function summaryCard(q, opts) {
     opts = opts || {};
-    let rows = `<div class="sum-row is-callout"><span class="lbl">${esc(q.callout.label)}</span>
-                 <span class="amt">${money(q.callout.amount)}</span></div>`;
+    let rows = '';
 
     q.lines.forEach(l => {
       rows += `<div class="sum-row"><span class="lbl">${esc(l.name)}${l.quantity > 1 ? ' &times; ' + l.quantity : ''}</span>
                <span class="amt">${money(l.lineTotal)}</span></div>`;
     });
 
+    if (q.stairs.applied) {
+      rows += `<div class="sum-row"><span class="lbl">${esc(q.stairs.label)}</span>
+               <span class="amt">${money(q.stairs.amount)}</span></div>`;
+    }
     if (q.urgent.applied) {
       rows += `<div class="sum-row"><span class="lbl">${esc(q.urgent.label)}</span>
                <span class="amt">${money(q.urgent.amount)}</span></div>`;

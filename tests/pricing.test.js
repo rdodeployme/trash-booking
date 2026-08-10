@@ -1,5 +1,8 @@
 /* Pricing tests — run with:  node tests/pricing.test.js
-   Covers every scenario in the build brief plus the rules that must never break. */
+
+   ALL-IN PRICING (from the 2026-08-10 price list). There is no call-out fee:
+   the price beside an item is what that item costs to have collected. Stairs
+   and urgent are flat surcharges, charged once per booking. */
 
 const P = require('../assets/js/pricing.js');
 const { TRASH_CONFIG } = require('../assets/js/config.js');
@@ -15,87 +18,84 @@ function check(name, actual, expected) {
 const base = { items: {}, stairs: false, urgent: false, dismantling: 'none', conditions: {}, postcode: '3011' };
 const q = o => P.calculateBooking(Object.assign({}, base, o));
 
-console.log('\nBRIEF SCENARIOS');
-check('Test 1  1x queen mattress, nothing else = $164',
-  q({ items: { 'mat-queen': 1 } }).total, 164);
+console.log('\nCORE SCENARIOS');
+check('1  one double/queen/king mattress = $139',
+  q({ items: { 'mat-dqk': 1 } }).total, 139);
 
-check('Test 2  2x queen mattress, no stairs = $229',
-  q({ items: { 'mat-queen': 2 } }).total, 229);
+check('2  two of them = $278 (no multi-item discount)',
+  q({ items: { 'mat-dqk': 2 } }).total, 278);
 
-check('Test 3  1x queen mattress + stairs = $264',
-  q({ items: { 'mat-queen': 1 }, stairs: true }).total, 264);
+check('3  one mattress + stairs = $239',
+  q({ items: { 'mat-dqk': 1 }, stairs: true }).total, 239);
 
-check('Test 4  3-seater + urgent + dismantle 1-2 = $414',
-  q({ items: { 'sofa-3': 1 }, urgent: true, dismantling: '1-2' }).total, 414);
+check('4  3-seater couch + urgent + dismantle 1-2 = $289',
+  q({ items: { 'sofa-3': 1 }, urgent: true, dismantling: '1-2' }).total, 289);
 
-check('Test 5  3-seater + stairs + urgent + dismantle 3-5 = $554',
-  q({ items: { 'sofa-3': 1 }, stairs: true, urgent: true, dismantling: '3-5' }).total, 554);
+check('5  3-seater couch + stairs + urgent + dismantle 3-5 = $429',
+  q({ items: { 'sofa-3': 1 }, stairs: true, urgent: true, dismantling: '3-5' }).total, 429);
 
 const t6 = q({ items: { 'sofa-3': 1 }, dismantling: '6plus' });
-check('Test 6  dismantle 6+ disables payment', t6.paymentAllowed, false);
-check('Test 6  dismantle 6+ flags manual review', t6.manualReview, true);
-check('Test 6  dismantle 6+ invents no dismantling price', t6.dismantling.amount, 0);
+check('6  dismantle 6+ disables payment', t6.paymentAllowed, false);
+check('6  dismantle 6+ flags manual review', t6.manualReview, true);
+check('6  dismantle 6+ invents no dismantling price', t6.dismantling.amount, 0);
 
 console.log('\nRULES THAT MUST NEVER BREAK');
-check('Call-out charged once, not per item',
-  q({ items: { 'mat-queen': 3, 'sofa-2': 2 } }).callout.amount, 99);
+check('No call-out is added to a single item',
+  q({ items: { 'mat-dqk': 1 } }).total, TRASH_CONFIG.itemsById['mat-dqk'].charge);
 
-check('Stairs REPLACES the call-out (never $298)',
-  q({ items: { 'mat-queen': 1 }, stairs: true }).callout.amount, 199);
+check('No per-booking fee appears on a multi-item booking either',
+  q({ items: { 'mat-dqk': 1, 'sofa-3': 1 } }).total, 139 + 169);
 
-check('Stairs call-out + items only = 199 + 195',
-  q({ items: { 'sofa-3': 1 }, stairs: true }).total, 394);
+check('Stairs adds exactly $100',
+  q({ items: { 'sofa-3': 1 }, stairs: true }).total - q({ items: { 'sofa-3': 1 } }).total, 100);
+
+check('Stairs is charged ONCE, not per item',
+  q({ items: { 'mat-dqk': 3, 'sofa-3': 2 }, stairs: true }).total,
+  (139 * 3) + (169 * 2) + 100);
 
 check('Urgent adds exactly $100',
-  q({ items: { 'mat-queen': 1 }, urgent: true }).total - q({ items: { 'mat-queen': 1 } }).total, 100);
+  q({ items: { 'mat-dqk': 1 }, urgent: true }).total - 139, 100);
+
+check('Stairs and urgent stack to exactly $200, never more',
+  q({ items: { 'mat-dqk': 1 }, stairs: true, urgent: true }).total - 139, 200);
 
 check('Dismantling 1-2 adds exactly $20',
-  q({ items: { 'mat-queen': 1 }, dismantling: '1-2' }).total - 164, 20);
+  q({ items: { 'mat-dqk': 1 }, dismantling: '1-2' }).total - 139, 20);
 
 check('Dismantling 3-5 adds exactly $60',
-  q({ items: { 'mat-queen': 1 }, dismantling: '3-5' }).total - 164, 60);
+  q({ items: { 'mat-dqk': 1 }, dismantling: '3-5' }).total - 139, 60);
 
-check('No multi-item discount: 2 queens cost exactly 2 x $65',
-  q({ items: { 'mat-queen': 2 } }).itemTotal, 130);
-
-check('Empty booking cannot be paid for',
-  q({}).paymentAllowed, false);
+check('Empty booking is $0 and cannot be paid for',
+  [q({}).total, q({}).paymentAllowed], [0, false]);
 
 check('Difficult access routes to manual review',
-  q({ items: { 'mat-queen': 1 }, conditions: { difficultAccess: true } }).paymentAllowed, false);
+  q({ items: { 'mat-dqk': 1 }, conditions: { difficultAccess: true } }).paymentAllowed, false);
 
 check('Heavy item routes to manual review',
-  q({ items: { 'mat-queen': 1 }, conditions: { heavyItem: true } }).paymentAllowed, false);
+  q({ items: { 'mat-dqk': 1 }, conditions: { heavyItem: true } }).paymentAllowed, false);
 
 check('Out-of-area postcode routes to manual review',
-  q({ items: { 'mat-queen': 1 }, postcode: '9999' }).paymentAllowed, false);
+  q({ items: { 'mat-dqk': 1 }, postcode: '9999' }).paymentAllowed, false);
 
-console.log('\nEVERY ITEM PRICES CORRECTLY (callout + charge)');
-let itemsChecked = 0, itemsBad = 0;
+console.log('\nEVERY ITEM PRICES AT EXACTLY ITS OWN CHARGE');
+let checked = 0, bad = 0;
 TRASH_CONFIG.categories.forEach(cat => cat.items.forEach(item => {
-  itemsChecked++;
-  const r = q({ items: { [item.id]: 1 } });
-  const expected = Math.round((99 + item.charge) * 100) / 100;
-  if (r.total !== expected) {
-    itemsBad++;
-    console.log(`  FAIL  ${item.name}: expected ${expected}, got ${r.total}`);
+  checked++;
+  const one = q({ items: { [item.id]: 1 } });
+  if (one.total !== item.charge) {
+    bad++; console.log(`  FAIL  ${item.name}: qty 1 gave ${one.total}, charge is ${item.charge}`);
   }
-  // quantity of 3 must be exactly 3x the charge, no rounding drift
-  const r3 = q({ items: { [item.id]: 3 } });
-  const expected3 = Math.round((99 + item.charge * 3) * 100) / 100;
-  if (r3.total !== expected3) {
-    itemsBad++;
-    console.log(`  FAIL  ${item.name} x3: expected ${expected3}, got ${r3.total}`);
+  const three = q({ items: { [item.id]: 3 } });
+  const expected3 = Math.round(item.charge * 3 * 100) / 100;
+  if (three.total !== expected3) {
+    bad++; console.log(`  FAIL  ${item.name}: qty 3 gave ${three.total}, expected ${expected3}`);
   }
 }));
-check(`All ${itemsChecked} items across ${TRASH_CONFIG.categories.length} categories price correctly at qty 1 and 3`,
-  itemsBad, 0);
+check(`All ${checked} items price correctly at qty 1 and qty 3`, bad, 0);
 
 console.log('\nCATALOGUE SHAPE');
-check('Exactly 8 categories', TRASH_CONFIG.categories.length, 8);
-// 5 mattresses + 5 bases + 5 sofas + 3 sofa beds + 3 recliners
-// + 3 tables + 3 chair lines + 6 fridges/freezers
-check('Exactly 33 items', itemsChecked, 33);
+check('11 categories', TRASH_CONFIG.categories.length, 11);
+check('61 items', checked, 61);
 
 const iconNames = new Set(require('../assets/js/icons.js').names);
 const missingIcons = [];
@@ -104,6 +104,20 @@ TRASH_CONFIG.categories.forEach(cat => {
   cat.items.forEach(i => { if (!iconNames.has(i.icon)) missingIcons.push(`item ${i.id} -> ${i.icon}`); });
 });
 check('Every category and item has a real icon (no silent fallbacks)', missingIcons, []);
+
+const dupIds = [];
+const seen = new Set();
+TRASH_CONFIG.categories.forEach(c => c.items.forEach(i => {
+  if (seen.has(i.id)) dupIds.push(i.id); else seen.add(i.id);
+}));
+check('No duplicate item ids', dupIds, []);
+
+/* The legacy items are still on the old volume-based pricing and are the one
+   thing in the catalogue that is knowingly not repriced. Pin the count so
+   nobody loses track of how many are outstanding. */
+const legacy = [];
+TRASH_CONFIG.categories.forEach(c => c.items.forEach(i => { if (i.legacy) legacy.push(i.id); }));
+check('16 items still flagged as needing repricing', legacy.length, 16);
 
 console.log(`\n${pass} passed, ${fail} failed\n`);
 process.exit(fail === 0 ? 0 : 1);

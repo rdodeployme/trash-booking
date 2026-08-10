@@ -45,10 +45,12 @@ const TRASH_CONFIG = {
   },
 
   /* ---- Fees (all AUD) --------------------------------------------------- */
+  // Item prices are ALL-IN. There is no call-out fee: the price beside an item
+  // is what that item costs to have collected. (Superseded the old
+  // "$99 call-out + volume x $130/m3" model on 2026-08-10.)
   fees: {
-    calloutStandard: 99,             // once per booking
-    calloutStairs:   199,            // REPLACES the standard call-out, never added to it
-    urgent:          100             // flat add-on
+    stairs: 100,                     // flat, once per booking — never per item
+    urgent: 100                      // flat, once per booking
   },
 
   /* ---- Dismantling tiers ------------------------------------------------ */
@@ -106,83 +108,145 @@ const TRASH_CONFIG = {
   },
 
   /* ---- Categories and items -------------------------------------------- */
-  // volumeM3 is INTERNAL ONLY. It is never rendered to the customer.
+  //
+  // Prices are ALL-IN per item (source: "Trash price - update items.csv",
+  // 2026-08-10). They are set by hand, not derived from volume — the old
+  // $130/m3 rate no longer applies, so volumeM3 survives only as internal
+  // reference on the items that had one. It is never rendered and never priced.
+  //
+  // `note`   — the short description from the pricing sheet, shown on the card.
+  // `legacy` — NOT in the 2026-08-10 price list. Still on the old volume-based
+  //            pricing and ** NEEDS REPRICING ** before launch. Kept bookable on
+  //            Andy's instruction rather than dropping the service.
+  //
   categories: [
     {
       id: 'mattresses', name: 'Mattresses', icon: 'mattress',
       items: [
-        { id: 'mat-single',     name: 'Single mattress',      icon: 'mattress-s',  volumeM3: 0.30, charge: 39.00 },
-        { id: 'mat-king-single',name: 'King single mattress', icon: 'mattress-ks', volumeM3: 0.35, charge: 45.50 },
-        { id: 'mat-double',     name: 'Double mattress',      icon: 'mattress-d',  volumeM3: 0.45, charge: 58.50 },
-        { id: 'mat-queen',      name: 'Queen mattress',       icon: 'mattress-q',  volumeM3: 0.50, charge: 65.00 },
-        { id: 'mat-king',       name: 'King mattress',        icon: 'mattress-k',  volumeM3: 0.60, charge: 78.00 }
+        { id: 'mat-single-ks', name: 'Mattress — single/king single', icon: 'mattress-s',  charge: 99 },
+        { id: 'mat-dqk',       name: 'Mattress — double/queen/king', icon: 'mattress-k',  charge: 139 },
+        { id: 'mat-cot',       name: 'Mattress — cot or crib',           icon: 'mattress-cot', charge: 29 },
+        { id: 'topper-single-ks', name: 'Topper — single/king single', icon: 'topper-s', charge: 19 },
+        { id: 'topper-dqk',       name: 'Topper — double/queen/king', icon: 'topper-k', charge: 29,
+          note: 'Standard size' }
       ]
     },
     {
-      id: 'bed-bases', name: 'Bed Bases', icon: 'bedbase',
+      id: 'beds', name: 'Beds & Bases', icon: 'bedbase',
       items: [
-        { id: 'base-single',      name: 'Single bed base',      icon: 'bedbase-s',  volumeM3: 0.35, charge: 45.50 },
-        { id: 'base-king-single', name: 'King single bed base', icon: 'bedbase-ks', volumeM3: 0.40, charge: 52.00 },
-        { id: 'base-double',      name: 'Double bed base',      icon: 'bedbase-d',  volumeM3: 0.50, charge: 65.00 },
-        { id: 'base-queen',       name: 'Queen bed base',       icon: 'bedbase-q',  volumeM3: 0.60, charge: 78.00 },
-        { id: 'base-king',        name: 'King bed base',        icon: 'bedbase-k',  volumeM3: 0.70, charge: 91.00 }
+        { id: 'base-single-ks', name: 'Bed base — single/king single', icon: 'bedbase-s', charge: 79,
+          note: 'A solid box, not slatted' },
+        { id: 'base-dqk',       name: 'Bed base — double/queen/king', icon: 'bedbase-k', charge: 99,
+          note: 'A solid box, not slatted' },
+        { id: 'frame-single-ks', name: 'Bed frame — single/king single', icon: 'bedframe-s', charge: 79,
+          note: 'Slats, leg posts, header and footer' },
+        { id: 'frame-dqk',       name: 'Bed frame — double/queen/king', icon: 'bedframe-k', charge: 99,
+          note: 'Slats, leg posts, header and footer' },
+        { id: 'headboard-single-ks', name: 'Headboard — single/king single', icon: 'headboard-s', charge: 39 },
+        { id: 'headboard-dqk',       name: 'Headboard — double/queen/king', icon: 'headboard-k', charge: 49 },
+        { id: 'bunk-ss', name: 'Bunk bed — single over single', icon: 'bunk-ss', charge: 129 },
+        { id: 'bunk-sd', name: 'Bunk bed — single over double', icon: 'bunk-sd', charge: 169 },
+        { id: 'bunk-dd', name: 'Bunk bed — double over double', icon: 'bunk-dd', charge: 229 }
       ]
     },
     {
-      id: 'sofas', name: 'Sofas & Lounges', icon: 'sofa',
+      id: 'couches', name: 'Couches & Sofas', icon: 'sofa',
       items: [
-        { id: 'sofa-armchair', name: 'Armchair or single-seater', icon: 'armchair', volumeM3: 0.50, charge: 65.00 },
-        { id: 'sofa-2',        name: 'Two-seater sofa',           icon: 'sofa-2',   volumeM3: 1.00, charge: 130.00 },
-        { id: 'sofa-3',        name: 'Three-seater sofa',         icon: 'sofa-3',   volumeM3: 1.50, charge: 195.00 },
-        { id: 'sofa-4',        name: 'Four-seater sofa',          icon: 'sofa-4',   volumeM3: 2.00, charge: 260.00 },
-        { id: 'sofa-modular',  name: 'Modular or corner lounge',  icon: 'modular',  volumeM3: 2.50, charge: 325.00 }
-      ]
-    },
-    {
-      id: 'sofa-beds', name: 'Sofa Beds', icon: 'sofabed',
-      items: [
-        { id: 'sofabed-1', name: 'Single sofa bed',       icon: 'sofabed-1', volumeM3: 0.75, charge: 97.50 },
-        { id: 'sofabed-2', name: 'Two-seater sofa bed',   icon: 'sofabed-2', volumeM3: 1.20, charge: 156.00 },
-        { id: 'sofabed-3', name: 'Three-seater sofa bed', icon: 'sofabed-3', volumeM3: 1.60, charge: 208.00 }
+        { id: 'sofa-1', name: 'Couch — 1 seat',  icon: 'sofa-1', charge: 69 },
+        { id: 'sofa-2', name: 'Couch — 2 seater', icon: 'sofa-2', charge: 159 },
+        { id: 'sofa-3', name: 'Couch — 3 seater', icon: 'sofa-3', charge: 169 },
+        { id: 'sofa-4', name: 'Couch — 4 seater', icon: 'sofa-4', charge: 189 },
+        { id: 'sofa-5', name: 'Couch — 5 seater', icon: 'sofa-5', charge: 199 },
+        { id: 'sofa-6', name: 'Couch — 6 seater', icon: 'sofa-6', charge: 279 },
+        { id: 'sofa-7', name: 'Couch — 7 seater', icon: 'sofa-7', charge: 299 },
+        { id: 'sofa-8', name: 'Couch — 8 seater', icon: 'sofa-8', charge: 399 },
+        { id: 'sofa-chaise', name: 'Chaise section', icon: 'chaise', charge: 59,
+          note: 'Add as well as your couch' }
       ]
     },
     {
       id: 'recliners', name: 'Recliners', icon: 'recliner',
       items: [
-        { id: 'rec-standard', name: 'Standard recliner',  icon: 'recliner',    volumeM3: 0.60, charge: 78.00 },
-        { id: 'rec-electric', name: 'Electric recliner',  icon: 'recliner-e',  volumeM3: 0.70, charge: 91.00 },
-        { id: 'rec-2',        name: 'Two-seater recliner', icon: 'recliner-2', volumeM3: 1.20, charge: 156.00 }
+        { id: 'rec-1', name: 'Recliner — 1 seat',  icon: 'recliner',   charge: 79 },
+        { id: 'rec-2', name: 'Recliner — 2 seat',  icon: 'recliner-2', charge: 159 },
+        { id: 'rec-3', name: 'Recliner — 3 seat',  icon: 'recliner-3', charge: 179 },
+        { id: 'rec-electric', name: 'Electric recliner', icon: 'recliner-e', volumeM3: 0.70, charge: 91.00, legacy: true }
+      ]
+    },
+    {
+      id: 'sofa-beds', name: 'Sofa Beds & Futons', icon: 'sofabed',
+      items: [
+        { id: 'futon-2', name: 'Futon — 2 seater', icon: 'sofabed-2', charge: 169 },
+        { id: 'futon-3', name: 'Futon — 3 seater', icon: 'sofabed-3', charge: 199 },
+        { id: 'sofabed-1', name: 'Single sofa bed',       icon: 'sofabed-1', volumeM3: 0.75, charge: 97.50, legacy: true },
+        { id: 'sofabed-2', name: 'Two-seater sofa bed',   icon: 'sofabed-2', volumeM3: 1.20, charge: 156.00, legacy: true },
+        { id: 'sofabed-3', name: 'Three-seater sofa bed', icon: 'sofabed-3', volumeM3: 1.60, charge: 208.00, legacy: true }
+      ]
+    },
+    {
+      id: 'outdoor', name: 'Outdoor Lounges', icon: 'outdoor',
+      items: [
+        { id: 'out-1', name: 'Outdoor couch — armchair', icon: 'outdoor-1', charge: 69 },
+        { id: 'out-2', name: 'Outdoor couch — 2 seater', icon: 'outdoor-2', charge: 149 },
+        { id: 'out-3', name: 'Outdoor couch — 3 seater', icon: 'outdoor-3', charge: 169 },
+        { id: 'out-4', name: 'Outdoor couch — 4 seater', icon: 'outdoor-4', charge: 189 },
+        { id: 'out-5', name: 'Outdoor couch — 5 seater', icon: 'outdoor-5', charge: 199 },
+        { id: 'out-6', name: 'Outdoor couch — 6 seater', icon: 'outdoor-6', charge: 279 },
+        { id: 'out-7', name: 'Outdoor couch — 7 seater', icon: 'outdoor-7', charge: 299 },
+        { id: 'out-8', name: 'Outdoor couch — 8 seater', icon: 'outdoor-8', charge: 399 }
+      ]
+    },
+    {
+      id: 'pianos', name: 'Pianos', icon: 'piano',
+      items: [
+        { id: 'piano-upright',    name: 'Upright piano',    icon: 'piano',       charge: 1299,
+          note: 'Maximum size applies' },
+        { id: 'piano-baby-grand', name: 'Baby grand piano', icon: 'piano-grand', charge: 1299,
+          note: 'Maximum size applies' },
+        { id: 'piano-grand',      name: 'Grand piano',      icon: 'piano-grand', charge: 1299,
+          note: 'Maximum size applies' }
+      ]
+    },
+    {
+      id: 'tyres', name: 'Tyres & Rims', icon: 'tyre',
+      items: [
+        { id: 'rim-tyre-truck',   name: 'Rim & tyre — truck',   icon: 'rim-tyre', charge: 69 },
+        { id: 'rim-tyre-tractor', name: 'Rim & tyre — tractor', icon: 'rim-tyre', charge: 499,
+          note: 'Industrial/agricultural' },
+        { id: 'tyre-truck',       name: 'Tyre only — truck',    icon: 'tyre',     charge: 59 },
+        { id: 'rim-car',          name: 'Rim only — car',       icon: 'rim',      charge: 10 },
+        { id: 'rim-truck',        name: 'Rim only — truck',     icon: 'rim',      charge: 19 },
+        { id: 'rim-tractor',      name: 'Rim only — tractor',   icon: 'rim',      charge: 59 }
       ]
     },
     {
       id: 'dining-tables', name: 'Dining Tables', icon: 'table',
       items: [
-        { id: 'table-4', name: 'Four-seat dining table',  icon: 'table-4', volumeM3: 0.30, charge: 39.00 },
-        { id: 'table-6', name: 'Six-seat dining table',   icon: 'table-6', volumeM3: 0.40, charge: 52.00 },
-        { id: 'table-8', name: 'Eight-seat dining table', icon: 'table-8', volumeM3: 0.60, charge: 78.00 }
+        { id: 'table-4', name: 'Four-seat dining table',  icon: 'table-4', volumeM3: 0.30, charge: 39.00, legacy: true },
+        { id: 'table-6', name: 'Six-seat dining table',   icon: 'table-6', volumeM3: 0.40, charge: 52.00, legacy: true },
+        { id: 'table-8', name: 'Eight-seat dining table', icon: 'table-8', volumeM3: 0.60, charge: 78.00, legacy: true }
       ]
     },
     {
       id: 'dining-chairs', name: 'Dining Chairs', icon: 'chair',
       items: [
-        { id: 'chair-1', name: 'Individual dining chair',   icon: 'chair',   volumeM3: 0.10, charge: 13.00 },
-        { id: 'chair-4', name: 'Set of four dining chairs', icon: 'chair-4', volumeM3: 0.40, charge: 52.00 },
-        { id: 'chair-6', name: 'Set of six dining chairs',  icon: 'chair-6', volumeM3: 0.60, charge: 78.00 }
+        { id: 'chair-1', name: 'Individual dining chair',   icon: 'chair',   volumeM3: 0.10, charge: 13.00, legacy: true },
+        { id: 'chair-4', name: 'Set of four dining chairs', icon: 'chair-4', volumeM3: 0.40, charge: 52.00, legacy: true },
+        { id: 'chair-6', name: 'Set of six dining chairs',  icon: 'chair-6', volumeM3: 0.60, charge: 78.00, legacy: true }
       ]
     },
     {
       id: 'fridges', name: 'Fridges & Freezers', icon: 'fridge',
       items: [
-        { id: 'fridge-bar',    name: 'Bar fridge',                 icon: 'fridge-bar',    volumeM3: 0.20, charge: 26.00 },
-        { id: 'fridge-single', name: 'Standard single-door fridge', icon: 'fridge-single', volumeM3: 0.40, charge: 52.00 },
-        { id: 'fridge-double', name: 'Large two-door fridge',      icon: 'fridge-double', volumeM3: 0.65, charge: 84.50 },
-        { id: 'fridge-french', name: 'French-door fridge',         icon: 'fridge-french', volumeM3: 0.75, charge: 97.50 },
-        { id: 'freezer-up',    name: 'Upright freezer',            icon: 'freezer-up',    volumeM3: 0.40, charge: 52.00 },
-        { id: 'freezer-chest', name: 'Chest freezer',              icon: 'freezer-chest', volumeM3: 0.50, charge: 65.00 }
+        { id: 'fridge-bar',    name: 'Bar fridge',                 icon: 'fridge-bar',    volumeM3: 0.20, charge: 26.00, legacy: true },
+        { id: 'fridge-single', name: 'Standard single-door fridge', icon: 'fridge-single', volumeM3: 0.40, charge: 52.00, legacy: true },
+        { id: 'fridge-double', name: 'Large two-door fridge',      icon: 'fridge-double', volumeM3: 0.65, charge: 84.50, legacy: true },
+        { id: 'fridge-french', name: 'French-door fridge',         icon: 'fridge-french', volumeM3: 0.75, charge: 97.50, legacy: true },
+        { id: 'freezer-up',    name: 'Upright freezer',            icon: 'freezer-up',    volumeM3: 0.40, charge: 52.00, legacy: true },
+        { id: 'freezer-chest', name: 'Chest freezer',              icon: 'freezer-chest', volumeM3: 0.50, charge: 65.00, legacy: true }
       ]
     }
   ],
-
   /* ---- Payment ---------------------------------------------------------- */
   // No payment provider exists in this project yet. See api/payment.php for the
   // single integration point. Until `provider` is set, the flow ends at a
