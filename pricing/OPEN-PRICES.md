@@ -95,18 +95,22 @@ futon to anchor it to.
 
 ### Car tyres and rims
 
-Underdetermined. Two unknowns, one equation:
+**Car rim only at $10 is confirmed correct** (Andy, 2026-08-10) — deliberate,
+not a typo, even though it is the only price in the list that doesn't end in 9.
+
+That confirmation tells us something useful: the truck's combined discount does
+**not** carry across to cars. If it did,
 
 ```
 rim & tyre (car) = rim only $10 + T − $9  =  T + $1
 ```
 
-Nothing in the list fixes `T`. Also worth checking: **car rim only at $10 is
-the only price in the whole list that doesn't end in 9** — every other one of
-the 45 does. Is $10 right, or is it a typo for $19?
+and for that to land on a 9-ending like the other 44 prices, `T` would have to
+end in 8 — nothing in the list does. So the car entries were priced on a
+different basis to the truck and tractor ones, and nothing in the list fixes `T`.
 
-One question settles both: *what do you charge to take a car tyre off someone's
-hands, with no rim?*
+**Still needed:** *what do you charge to take a car tyre off someone's hands,
+with no rim?* That single figure also sets car rim & tyre.
 
 ### Fridges & freezers — 6 items
 
@@ -138,10 +142,10 @@ Currently on old pricing: tables $39 / $52 / $78, chairs $13 / $52 / $78.
 |---|---|
 | Derived from the list, ready to apply | 1 |
 | Proposed, needs your yes | 2 (+1 structural decision) |
-| Needs a number from you | 15 |
+| Needs a number from you | 15 (one query closed: car rim $10 confirmed) |
 
 The three questions that unlock nearly all of it:
 
 1. What does it cost to dispose of **one standard fridge**, degassing included?
-2. What do you charge for a **car tyre with no rim** — and is car rim really $10?
+2. What do you charge for a **car tyre with no rim**?  _(car rim $10 — confirmed)_
 3. What's a **single dining chair** worth under the new pricing?
